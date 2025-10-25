@@ -1,0 +1,134 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <list>
+#include <algorithm>
+
+struct ZonaExhibicion {
+    std::string nombre;
+    int Cantidad_especies;
+    ZonaExhibicion (const std::string& n, int c) : nombre(n), Cantidad_especies(c) {}
+};
+
+struct Zoologico {
+    std::string nombre;
+    int anio_fundacion;
+    std::string ubicacion;
+    Zoologico (const std::string& n, int a, const std::string& u) : nombre(n), anio_fundacion(a), ubicacion(u) {}
+};
+
+    std::list<Zoologico> zoologicos;
+    std::vector<ZonaExhibicion> zonas;
+
+void SolicitarInformacion(){
+    std::string nombre_zoo, ubicacion;
+    int anio;
+    std::string nombre_zona;
+    int especies;
+    std::cout << "Ingrese el nombre del zoologico: ";
+    std::getline(std::cin, nombre_zoo);
+    std::cout << "Ingrese el anio de fundacion: ";
+    std::cin >> anio;
+    std::cin.ignore();
+    std::cout << "Ingrese la ubicacion del zoologico: ";
+    std::getline(std::cin, ubicacion);
+    zoologicos.emplace_back(nombre_zoo, anio, ubicacion);
+    std::cout << "Ingrese el nombre de la zona de exhibicion: ";
+    std::getline(std::cin, nombre_zona);
+    std::cout << "Ingrese la cantidad de especies en esta zona: ";
+    std::cin >> especies;
+    zonas.emplace_back(nombre_zona, especies);
+}
+
+void imprimirInformacion(const std::list<Zoologico>& zoologicos, const std::vector<ZonaExhibicion>& zonas) {
+    for (const auto& zoo : zoologicos) {
+        std::cout << "Zoologico: " << zoo.nombre << ", Anio de Fundacion: " << zoo.anio_fundacion << ", Ubicacion: " << zoo.ubicacion << std::endl;
+    }
+    for (const auto& zona : zonas) {
+        std::cout << "Zona de Exhibicion: " << zona.nombre << ", Cantidad de Especies: " << zona.Cantidad_especies << std::endl;
+    }
+}
+
+void ordenar(std::list<Zoologico>* zoologicos, const std::string& criterio) {
+    zoologicos->sort([criterio](const Zoologico& a, const Zoologico& b) {
+        if (criterio == "nombre") {
+            return a.nombre < b.nombre;
+        } else if (criterio == "anio_fundacion") {
+            return a.anio_fundacion < b.anio_fundacion;
+        } else if (criterio == "ubicacion") {
+            return a.ubicacion < b.ubicacion;
+        }
+        return false; 
+    });
+}
+
+void buscarRegistro(const std::list<Zoologico>& zoologicos, const std::string& criterio, const std::string& valor) {
+    auto it = std::find_if(zoologicos.begin(), zoologicos.end(), [&criterio, &valor](const Zoologico& zoo) {
+        if (criterio == "nombre") {
+            return zoo.nombre == valor;
+        } else if (criterio == "anio_fundacion") {
+            return std::to_string(zoo.anio_fundacion) == valor;
+        } else if (criterio == "ubicacion") {
+            return zoo.ubicacion == valor;
+        }
+        return false;
+    });
+
+    if (it != zoologicos.end()) {
+        std::cout << "Zoologico encontrado: " << it->nombre << ", Anio de Fundacion: " << it->anio_fundacion << ", Ubicacion: " << it->ubicacion << std::endl;
+    } else {
+        std::cout << "Zoologico no encontrado." << std::endl;
+    }
+}
+
+
+int main(){
+
+int opcion;
+do {
+    std::cout << "\n Inicio \n"
+    << "1. Solicitar datos\n"
+    << "2. Ordenar\n"
+    << "3. Imprimir\n"
+    << "4. Buscar\n"
+    << "5. Salir del programa\n"
+    << "Seleccione una opcion: ";
+    std::cin >> opcion;
+    std::cin.ignore();
+
+    switch(opcion)
+    {
+    case 1:
+        SolicitarInformacion();
+        break;
+    case 2:
+        {
+            std::string criterio;
+            std::cout << "Ingrese el criterio de ordenamiento (nombre, anio de fundacion, ubicacion): ";
+            std::getline(std::cin, criterio);
+            ordenar(&zoologicos, criterio);
+            break; 
+        }
+    case 3:
+        imprimirInformacion(zoologicos, zonas);
+        break;
+    case 4:
+        {
+            std::string criterio, valor;
+            std::cout << "Ingrese el criterio de busqueda (nombre, anio de fundacion, ubicacion): ";
+            std::getline(std::cin, criterio);
+            std::cout << "Ingrese el valor a buscar: ";
+            std::getline(std::cin, valor);
+            buscarRegistro(zoologicos, criterio, valor);
+            break;
+        }
+    case 5:
+        std::cout << "Saliendo del programa." << std::endl;
+        break;
+    default:
+        std::cout << "Opción no valida. Intente de nuevo." << std::endl;
+    }
+} while (opcion != 5);
+
+return 0;
+}
